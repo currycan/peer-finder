@@ -6,52 +6,13 @@
 ## build
 ```bash
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o peer-finder; \
-upx --best scanner -o _upx_peer-finder; \
-mv -f _upx_scanner peer-finder
+upx --best peer-finder -o _upx_peer-finder; \
+mv -f _upx_peer-finder peer-finder
 ```
 
 
 ## usage
 
-
-
-Dockerfile
-```
-...
-
-# script
-ADD bootstrap.sh /bootstrap.sh
-ADD on-change.sh /on-change.sh
-RUN chmod +x /bootstrap.sh
-RUN chmod +x /on-change.sh
-
-ENTRYPOINT ["/bootstrap.sh"]
-```
-
-bootstrap.sh
-```
-/peer-finder -on-change=/on-change.sh -on-start=/on-change.sh -service=sfs -ns=default -dns-suffix=svc.cluster.local
-
-while true; do sleep 1000; done
-```
-
-on-change.sh
-```
-#! /bin/bash
-
-> /etc/peer_config
-while read -ra LINE; do
-    IP=${LINE#*,}
-    DNS=${LINE%%,*}
-    HOST=${LINE%%.*}
-
-    PEERS=("${PEERS[@]}" ${DNS})
-
-    echo "${DNS}" >> /etc/peer_config
-done
-
-echo ${PEERS}
-```
 
 `kubectl logs sfs-1`
 
